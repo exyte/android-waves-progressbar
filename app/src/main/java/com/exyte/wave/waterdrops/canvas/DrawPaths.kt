@@ -13,16 +13,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import com.exyte.wave.ui.theme.Blue
 import com.exyte.wave.ui.theme.Water
+import com.exyte.wave.waterdrops.Paths
 
 fun DrawScope.drawWaves(
-    paths: MutableList<Path>,
+    paths: Paths,
 ) {
     drawIntoCanvas {
-        it.drawPath(paths[1], paint.apply {
+        it.drawPath(paths.pathList[1], paint.apply {
             color = Blue
-
         })
-        it.drawPath(paths[0], paint.apply {
+        it.drawPath(paths.pathList[0], paint.apply {
             color = androidx.compose.ui.graphics.Color.Black
             alpha = 0.9f
         })

@@ -32,7 +32,7 @@ fun createParabolaAsState(
         animationSpec = tween(
             durationMillis = dropWaterDuration,
             easing = { OvershootInterpolator(6f).getInterpolation(it) }
-        )
+        ),
     )
 
     val point1 = remember(position, elementSize, waterLevel, parabolaHeightMultiplier) {

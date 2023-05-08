@@ -1,5 +1,6 @@
 package com.exyte.wave.waterdrops
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -61,14 +63,15 @@ fun WaterDropLayout(
         duration = waveDuration
     )
 
-    val waterLevel = remember(waveProgress, containerSize.height) {
+    Log.e("mre", "$waveProgress")
+    val waterLevel by remember(waveProgress, containerSize.height) {
         derivedStateOf {
             (waveProgress * containerSize.height).toInt()
         }
     }
 
     val levelState = createLevelAsState(
-        waterLevelProvider = { waterLevel.value },
+        waterLevelProvider = { waterLevel },
         bufferY = waveParams.bufferY,
         elementParams = elementParams
     )
@@ -77,11 +80,13 @@ fun WaterDropLayout(
         containerSize = containerSize,
         elementParams = elementParams,
         levelState = levelState,
-        waterLevelProvider = { waterLevel.value.toFloat() },
+        waterLevelProvider = { waterLevel.toFloat() },
         dropWaterDuration = dropWaterDuration,
         animations = animations,
         waveParams = waveParams
     )
+
+    Log.e("someImage", "$paths")
 
     val textStyle = remember { content().textStyle }
     val textMeasurer = rememberTextMeasurer(100)
@@ -132,7 +137,7 @@ fun WaterDropLayout(
             .background(Water)
             .fillMaxSize()
     ) {
-        drawWaves(paths.value)
+        drawWaves(paths)
     }
 
     Box(
@@ -150,7 +155,7 @@ fun WaterDropLayout(
             .graphicsLayer(alpha = 0.99f)
             .drawWithContent {
                 drawTextWithBlendMode(
-                    mask = paths.value[0],
+                    mask = paths.pathList[0],
                     textStyle = textStyle,
                     unitTextStyle = unitTextStyle,
                     textOffset = textOffset,
@@ -177,4 +182,8 @@ fun WaterDropLayout(
 data class ElementParams(
     var size: IntSize = IntSize.Zero,
     var position: Offset = Offset(0f, 0f),
+)
+
+data class Paths(
+    val pathList: MutableList<Path> = mutableListOf(Path(), Path())
 )

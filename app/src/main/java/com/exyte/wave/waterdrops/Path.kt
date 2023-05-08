@@ -4,7 +4,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
@@ -28,7 +29,7 @@ fun createPathsAsState(
     animations: MutableList<State<Float>>,
     waveParams: WaveParams,
     elementParams: ElementParams,
-): State<MutableList<Path>> {
+): Paths {
 
     val parabola = createParabolaAsState(
         position = elementParams.position,
@@ -50,7 +51,8 @@ fun createPathsAsState(
         pointsQuantity = waveParams.pointsQuantity
     )
 
-    val initialMultipliers = createInitialMultipliersAsState(pointsQuantity = waveParams.pointsQuantity)
+    val initialMultipliers =
+        createInitialMultipliersAsState(pointsQuantity = waveParams.pointsQuantity)
     val waveMultiplier = animateFloatAsState(
         targetValue = if (levelState.value == LevelState.WaveIsComing) {
             1f
@@ -64,10 +66,8 @@ fun createPathsAsState(
         },
     )
 
-    val paths = remember {
-        derivedStateOf {
-            mutableListOf(Path(), Path())
-        }
+    val paths by remember {
+        mutableStateOf(Paths())
     }
 
     createPaths(
@@ -79,7 +79,7 @@ fun createPathsAsState(
         parabolaInterpolation(waveMultiplier.value),
         containerSize,
         plottedPoints,
-        paths.value,
+        paths,
         elementParams
     )
     return paths
@@ -94,9 +94,9 @@ fun createPaths(
     waveMultiplier: Float = 1f,
     containerSize: IntSize,
     points: MutableList<PointF>,
-    paths: MutableList<Path>,
+    paths: Paths,
     elementParams: ElementParams,
-): MutableList<Path> {
+): Paths {
 
     for (i in 0..1) {
         var wavePoints = points.copy()
@@ -113,8 +113,8 @@ fun createPaths(
             waveMultiplier = if (divider == 0) waveMultiplier / 2 else waveMultiplier,
             bufferX = bufferX,
         )
-        paths[i].reset()
-        paths[i] = createPath(containerSize, wavePoints, paths[i])
+        paths.pathList[i].reset()
+        paths.pathList[i] = createPath(containerSize, wavePoints, paths.pathList[i])
     }
     return paths
 }
