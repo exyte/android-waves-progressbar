@@ -22,7 +22,7 @@ import com.exyte.wave.waterdrops.wave.WaveParams
 
 @Composable
 fun createPathsAsState(
-    levelState: State<LevelState>,
+    levelState: LevelState,
     containerSize: IntSize,
     waterLevelProvider: () -> Float,
     dropWaterDuration: Int,
@@ -30,14 +30,13 @@ fun createPathsAsState(
     waveParams: WaveParams,
     elementParams: ElementParams,
 ): Paths {
-
     val parabola = createParabolaAsState(
         position = elementParams.position,
         elementSize = elementParams.size,
         waterLevel = waterLevelProvider(),
         buffer = waveParams.bufferY,
         dropWaterDuration = dropWaterDuration,
-        levelState = levelState.value
+        levelState = levelState
     )
 
     val plottedPoints = createPlottedPointsAsState(
@@ -47,18 +46,14 @@ fun createPathsAsState(
         position = elementParams.position,
         buffer = waveParams.bufferY,
         elementSize = elementParams.size,
-        parabola = parabola,
+        parabola = parabola.value,
         pointsQuantity = waveParams.pointsQuantity
     )
 
     val initialMultipliers =
         createInitialMultipliersAsState(pointsQuantity = waveParams.pointsQuantity)
     val waveMultiplier = animateFloatAsState(
-        targetValue = if (levelState.value == LevelState.WaveIsComing) {
-            1f
-        } else {
-            0f
-        },
+        targetValue = if (levelState == LevelState.WaveIsComing) 1f else 0f,
         animationSpec = keyframes {
             durationMillis = dropWaterDuration
             (0.7f).at((0.2f * dropWaterDuration).toInt())
@@ -89,11 +84,11 @@ fun createPaths(
     animations: MutableList<State<Float>>,
     initialMultipliers: MutableList<Float>,
     maxHeight: Float,
-    levelState: State<LevelState>,
+    levelState: LevelState,
     bufferX: Float,
     waveMultiplier: Float = 1f,
     containerSize: IntSize,
-    points: MutableList<PointF>,
+    points: List<PointF>,
     paths: Paths,
     elementParams: ElementParams,
 ): Paths {
@@ -121,7 +116,7 @@ fun createPaths(
 
 fun createPath(
     containerSize: IntSize,
-    wavePoints: MutableList<PointF>,
+    wavePoints: List<PointF>,
     path: Path
 ): Path {
     path.moveTo(0f, containerSize.height.toFloat())
@@ -133,19 +128,18 @@ fun createPath(
 }
 
 fun addWaves(
-    points: MutableList<PointF>,
+    points: List<PointF>,
     animations: MutableList<State<Float>>,
     initialMultipliers: MutableList<Float>,
     maxHeight: Float,
     pointsInversion: Boolean,
-    levelState: State<LevelState>,
+    levelState: LevelState,
     position: Offset,
     elementSize: IntSize,
     bufferX: Float,
     waveMultiplier: Float,
-): MutableList<PointF> {
-    val elementRangeX =
-        (position.x - bufferX)..(position.x + elementSize.width + bufferX)
+): List<PointF> {
+    val elementRangeX = (position.x - bufferX)..(position.x + elementSize.width + bufferX)
     points.forEachIndexed { index, pointF ->
         val newIndex = if (pointsInversion) {
             index % animations.size
@@ -163,10 +157,8 @@ fun addWaves(
             maxHeight
         )
 
-        if (levelState.value is LevelState.WaveIsComing) {
-            if (pointF.x in elementRangeX) {
-                waveHeight *= waveMultiplier
-            }
+        if (levelState is LevelState.WaveIsComing && pointF.x in elementRangeX) {
+            waveHeight *= waveMultiplier
         }
 
         pointF.y = pointF.y - waveHeight

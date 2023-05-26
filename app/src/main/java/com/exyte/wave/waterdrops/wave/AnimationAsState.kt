@@ -20,16 +20,30 @@ fun createAnimationsAsState(
     val random = remember { Random(System.currentTimeMillis()) }
     val infiniteAnimation = rememberInfiniteTransition()
 
-    repeat(pointsQuantity/2) {
-        val durationMillis = random.nextInt(2000, 6000)
-        animations += infiniteAnimation.animateFloat(
-            initialValue = 0f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis),
-                repeatMode = RepeatMode.Reverse,
+    if (animations.size == 0) {
+        repeat(pointsQuantity / 2) {
+            val durationMillis = random.nextInt(2000, 6000)
+            animations += infiniteAnimation.animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis),
+                    repeatMode = RepeatMode.Reverse,
+                )
             )
-        )
+        }
+    } else {
+        repeat(pointsQuantity / 2) {
+            val durationMillis = random.nextInt(2000, 6000)
+            animations[it] = infiniteAnimation.animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis),
+                    repeatMode = RepeatMode.Reverse,
+                )
+            )
+        }
     }
     return animations
 }

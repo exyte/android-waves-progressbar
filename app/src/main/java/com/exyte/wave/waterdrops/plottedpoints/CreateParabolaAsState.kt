@@ -4,7 +4,9 @@ import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
@@ -21,21 +23,17 @@ fun createParabolaAsState(
     buffer: Float,
     levelState: LevelState,
     dropWaterDuration: Int,
-): Parabola {
+): State<Parabola> {
 
     val parabolaHeightMultiplier = animateFloatAsState(
-        targetValue = if (levelState == LevelState.WaveIsComing) {
-            0f
-        } else {
-            -1f
-        },
+        targetValue = if (levelState == LevelState.WaveIsComing) 0f else -1f,
         animationSpec = tween(
             durationMillis = dropWaterDuration,
             easing = { OvershootInterpolator(6f).getInterpolation(it) }
         ),
     )
 
-    val point1 = remember(position, elementSize, waterLevel, parabolaHeightMultiplier) {
+    val point1 by remember(position, elementSize, waterLevel, parabolaHeightMultiplier) {
         mutableStateOf(
             PointF(
                 position.x,
@@ -44,7 +42,7 @@ fun createParabolaAsState(
         )
     }
 
-    val point2 = remember(position, elementSize, waterLevel, parabolaHeightMultiplier) {
+    val point2 by remember(position, elementSize, waterLevel, parabolaHeightMultiplier) {
         mutableStateOf(
             PointF(
                 position.x + elementSize.width,
@@ -53,7 +51,7 @@ fun createParabolaAsState(
         )
     }
 
-    val point3 = remember(position, elementSize, parabolaHeightMultiplier, waterLevel) {
+    val point3 by remember(position, elementSize, parabolaHeightMultiplier, waterLevel) {
         mutableStateOf(
             PointF(
                 position.x + elementSize.width / 2,
@@ -62,10 +60,9 @@ fun createParabolaAsState(
         )
     }
 
-    val parabola = remember(point1, point2, point3) {
+    return remember(point1, point2, point3) {
         derivedStateOf {
-            Parabola(point1.value, point2.value, point3.value)
+            Parabola(point1, point2, point3)
         }
     }
-    return parabola.value
 }

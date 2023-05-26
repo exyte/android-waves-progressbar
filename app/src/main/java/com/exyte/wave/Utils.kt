@@ -14,14 +14,14 @@ fun atElementLevel(
     waterLevel: Int,
     buffer: Float,
     elementParams: ElementParams,
-) =
-    (waterLevel >= (elementParams.position.y - buffer)) && (waterLevel < (elementParams.position.y + elementParams.size.height * 0.33))
+) = (waterLevel >= (elementParams.position.y - buffer)) &&
+        (waterLevel < (elementParams.position.y + elementParams.size.height * 0.33))
 
 fun isWaterFalls(
     waterLevel: Int,
     elementParams: ElementParams,
-) =
-    waterLevel >= (elementParams.position.y + elementParams.size.height * 0.33) && waterLevel <= (elementParams.position.y + elementParams.size.height)
+) = waterLevel >= (elementParams.position.y + elementParams.size.height * 0.33) &&
+        waterLevel <= (elementParams.position.y + elementParams.size.height)
 
 @Stable
 data class PointF(
@@ -29,7 +29,7 @@ data class PointF(
     var y: Float
 )
 
-fun MutableList<PointF>.copy(): MutableList<PointF> = map {
+fun List<PointF>.copy(): List<PointF> = map {
     it.copy()
 }.toMutableList()
 
