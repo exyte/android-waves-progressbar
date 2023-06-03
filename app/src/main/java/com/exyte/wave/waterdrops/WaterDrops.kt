@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -139,7 +140,7 @@ fun WavesDrawing(
         modifier = modifier
             .clickable(onClick = onWavesClick)
             .onGloballyPositioned { containerSize = IntSize(it.size.width, it.size.height) }
-            .graphicsLayer(alpha = 0.99f)
+            .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
             .drawWithContent {
                 drawTextWithBlendMode(mask = paths.pathList[0], textParams = textParams.value)
             }
