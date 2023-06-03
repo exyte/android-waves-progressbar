@@ -1,6 +1,6 @@
 ![header](https://user-images.githubusercontent.com/9447630/217482844-e5f420cf-7aa2-4684-8238-54064bbb23ba.png)
 
-<p><h1 align="left">Android Waves Prorgessbar</h1></p>
+<p><h1 align="left">Android Waves Progress Bar</h1></p>
 A depth gauge progress bar, inspired by Apple Watch dive widget.
 </br>
 <a href="https://exyte.com/blog/water-level-widget">Read Article »</a>
